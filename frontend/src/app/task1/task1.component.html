@@ -1,0 +1,72 @@
+<div class="task1-container">
+  <h2>Astrological Charts</h2>
+
+  <div *ngIf="isLoading" class="loading-state" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <p>Loading astrological charts...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-state" role="alert">
+    <p>⚠️ {{ error }}</p>
+    <button type="button" (click)="fetchCharts()" class="retry-btn">Retry</button>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error">
+    <div *ngIf="charts.length > 0; else noCharts" class="charts-grid">
+      <article
+        *ngFor="let chart of charts; let i = index; trackBy: trackById"
+        class="chart-card"
+        [style.animation-delay.ms]="i * 70"
+      >
+        <header class="chart-header">
+          <h3>{{ chart.name || 'Unnamed Chart' }}</h3>
+          <span *ngIf="chart.isPublic === false" class="badge">Private</span>
+        </header>
+
+        <div class="chart-details">
+          <div class="detail-row">
+            <span class="detail-label">📅 Date</span>
+            <span>{{ formatDate(chart.birthDate) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">🕒 Time</span>
+            <span>{{ chart.birthTime || 'Not specified' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">📍 Location</span>
+            <span class="detail-value">{{ chart.birthLocation || 'Not specified' }}</span>
+          </div>
+        </div>
+
+        <div class="signs-section">
+          <div class="sign-item">
+            <span class="sign-label">☀️ Sun</span>
+            <span class="sign-value">{{ signSymbol(chart.sunSign) }} {{ chart.sunSign }}</span>
+          </div>
+          <div class="sign-item">
+            <span class="sign-label">🌙 Moon</span>
+            <span class="sign-value">{{ signSymbol(chart.moonSign) }} {{ chart.moonSign }}</span>
+          </div>
+          <div class="sign-item">
+            <span class="sign-label">⬆️ Rising</span>
+            <span class="sign-value">{{ signSymbol(chart.risingSign) }} {{ chart.risingSign }}</span>
+          </div>
+        </div>
+
+        <ul class="planets-grid">
+          <li class="planet-item" *ngFor="let planet of getPlanetsArray(chart)">
+            <span class="planet-name"><span class="planet-symbol">{{ planet.symbol }}</span>{{ planet.name }}</span>
+            <span class="planet-details">{{ planet.sign }} {{ planet.degree }}°</span>
+          </li>
+        </ul>
+      </article>
+    </div>
+
+    <ng-template #noCharts>
+      <div class="empty-state">
+        <p>No astrological charts found.</p>
+        <button type="button" (click)="fetchCharts()" class="retry-btn">Refresh</button>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>

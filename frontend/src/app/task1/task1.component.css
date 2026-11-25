@@ -1,0 +1,312 @@
+.task1-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.4rem;
+  background: linear-gradient(180deg, #ffffff 0%, var(--text-muted) 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 40px rgba(212, 178, 106, 0.15);
+}
+
+h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 1px;
+  margin: 0.75rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* Loading */
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem;
+  border: 3px solid var(--border-strong);
+  border-radius: 50%;
+  border-top-color: var(--gold);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error */
+.error-state {
+  background: var(--danger-soft);
+  border: 1px solid rgba(240, 113, 120, 0.25);
+  color: var(--danger);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.retry-btn {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.retry-btn:hover {
+  background: var(--gold);
+  color: var(--bg);
+  box-shadow: 0 6px 20px -6px rgba(212, 178, 106, 0.6);
+}
+
+/* Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card */
+.chart-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg-elevated) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+  opacity: 0;
+  animation: fadeUp 0.6s var(--ease-out) forwards;
+  transition: transform 0.4s var(--ease-out), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Gold hairline that grows across the top on hover */
+.chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-strong), transparent);
+  box-shadow: 0 0 12px 1px rgba(212, 178, 106, 0.6);
+  transform: translateX(-50%);
+  transition: width 0.5s var(--ease-out);
+  z-index: 1;
+}
+
+.chart-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 178, 106, 0.3);
+  box-shadow: var(--shadow-lift), var(--glow-gold);
+}
+
+.chart-card:hover::before {
+  width: 85%;
+}
+
+.chart-header {
+  padding: 1.25rem 1.25rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(ellipse at top left, var(--violet-soft), transparent 70%);
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 1.45rem;
+  color: var(--gold-strong);
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  background: var(--violet-soft);
+  color: var(--violet);
+  border: 1px solid rgba(139, 124, 246, 0.3);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Details */
+.chart-details {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  color: var(--text-muted);
+}
+
+.detail-value {
+  text-align: right;
+}
+
+/* Big three */
+.signs-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.sign-item {
+  text-align: center;
+  padding: 0.9rem 0.5rem;
+}
+
+.sign-item + .sign-item {
+  border-left: 1px solid var(--border);
+}
+
+.sign-label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  margin-bottom: 0.2rem;
+}
+
+.sign-value {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--gold);
+  transition: text-shadow 0.4s ease;
+}
+
+.chart-card:hover .sign-value {
+  text-shadow: 0 0 14px rgba(212, 178, 106, 0.5);
+}
+
+/* Planets */
+.planets-grid {
+  list-style: none;
+  margin: 0;
+  padding: 1rem 1.25rem 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 0.75rem;
+}
+
+.planet-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--ease-out);
+}
+
+.planet-item:hover {
+  background: var(--violet-soft);
+  border-color: rgba(139, 124, 246, 0.35);
+  box-shadow: 0 4px 14px -6px rgba(139, 124, 246, 0.5);
+  transform: translateX(2px);
+}
+
+.planet-name {
+  color: var(--text);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.planet-symbol {
+  display: inline-block;
+  width: 1.2rem;
+  color: var(--violet);
+}
+
+.planet-details {
+  white-space: nowrap;
+}
+
+/* Empty */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.9rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .planets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .signs-section {
+    grid-template-columns: 1fr;
+  }
+
+  .sign-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+  }
+
+  .sign-item + .sign-item {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .sign-label {
+    margin-bottom: 0;
+  }
+}

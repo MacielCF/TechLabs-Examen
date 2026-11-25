@@ -1,0 +1,141 @@
+/* ===== Dark elegant theme tokens ===== */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --bg: #0b0c16;
+  --bg-elevated: #12131f;
+  --surface: #171828;
+  --surface-2: #1e2033;
+  --surface-hover: #24263c;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Text */
+  --text: #e8e6f0;
+  --text-muted: #9a98b0;
+  --text-subtle: #6d6b85;
+
+  /* Accents */
+  --gold: #d4b26a;
+  --gold-soft: rgba(212, 178, 106, 0.14);
+  --gold-strong: #e6c785;
+  --violet: #8b7cf6;
+  --violet-soft: rgba(139, 124, 246, 0.14);
+
+  /* States */
+  --danger: #f07178;
+  --danger-soft: rgba(240, 113, 120, 0.12);
+  --warning: #e6b450;
+  --warning-soft: rgba(230, 180, 80, 0.12);
+  --info-soft: rgba(139, 124, 246, 0.12);
+
+  /* Misc */
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -12px rgba(0, 0, 0, 0.7);
+  --glow-gold: 0 0 0 1px rgba(212, 178, 106, 0.25), 0 12px 40px -8px rgba(212, 178, 106, 0.25);
+  --glow-violet: 0 0 0 1px rgba(139, 124, 246, 0.25), 0 8px 28px -8px rgba(139, 124, 246, 0.35);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg);
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.35), transparent 50%),
+    radial-gradient(1px 1px at 70% 15%, rgba(255, 255, 255, 0.25), transparent 50%),
+    radial-gradient(1px 1px at 85% 60%, rgba(255, 255, 255, 0.3), transparent 50%),
+    radial-gradient(1px 1px at 40% 80%, rgba(255, 255, 255, 0.2), transparent 50%),
+    radial-gradient(1.5px 1.5px at 55% 45%, rgba(212, 178, 106, 0.35), transparent 50%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139, 124, 246, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(212, 178, 106, 0.06), transparent 70%);
+  background-size: 480px 480px, 480px 480px, 480px 480px, 480px 480px, 480px 480px, auto, auto;
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--gold-strong);
+}
+
+::selection {
+  background: var(--gold-soft);
+  color: var(--gold-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Native date/time picker icons are dark by default — make them visible */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) sepia(0.4) saturate(2) hue-rotate(5deg);
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: 10px;
+  border: 2px solid var(--bg);
+}
+
+/* Shared entrance animation (used with staggered animation-delay) */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
