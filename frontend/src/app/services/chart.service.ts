@@ -36,6 +36,7 @@ export interface Chart {
 }
 
 export interface CalculateChartRequest {
+    name?: string;
     birthDate: string;
     birthTime: string;
     birthLocation: string;
@@ -97,6 +98,12 @@ export class ChartService {
         return this.http
             .post<ApiResponse<Chart>>(`${this.apiUrl}/charts/calculate`, request)
             .pipe(map(res => res.data));
+    }
+
+    deleteChart(id: string): Observable<void> {
+        return this.http
+            .delete<ApiResponse<unknown>>(`${this.apiUrl}/charts/${id}`)
+            .pipe(map(() => undefined));
     }
 
     /**

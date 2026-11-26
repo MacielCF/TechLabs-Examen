@@ -1,25 +1,25 @@
 const Chart = require('../models/Chart');
 const { validationResult } = require('express-validator');
+const { SIGNS, sunPosition } = require('../utils/astro');
 
 
-// Helper function to generate random astrological data
-const generateAstrologicalData = (birthDate, birthTime, birthLocation) => {
-    const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-        'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
-
-    const randomSign = () => signs[Math.floor(Math.random() * signs.length)];
+// Generates astrological data for a birth date/time.
+// The Sun is calculated for real; the Moon, other planets and Rising sign are
+// still mocked (they would require an ephemeris and the location's coordinates).
+const generateAstrologicalData = (birthDate, birthTime) => {
+    const randomSign = () => SIGNS[Math.floor(Math.random() * SIGNS.length)];
     const randomDegree = () => Math.floor(Math.random() * 30);
 
-    // Keep sun/moon planet signs consistent with sunSign/moonSign
-    const sunSign = randomSign();
+    const sun = sunPosition(birthDate, birthTime);
+    // Keep the moon planet sign consistent with moonSign
     const moonSign = randomSign();
 
     return {
-        sunSign,
+        sunSign: sun.sign,
         moonSign,
         risingSign: randomSign(),
         planets: {
-            sun: { sign: sunSign, degree: randomDegree() },
+            sun,
             moon: { sign: moonSign, degree: randomDegree() },
             mercury: { sign: randomSign(), degree: randomDegree() },
             venus: { sign: randomSign(), degree: randomDegree() },
@@ -135,12 +135,14 @@ exports.calculateChart = async (req, res) => {
             });
         }
 
-        const { birthDate, birthTime, birthLocation, latitude, longitude, notes, createdBy } = req.body;
+        const { name, birthDate, birthTime, birthLocation, latitude, longitude, notes, createdBy } = req.body;
 
         // Generate astrological data (in real app, this would use actual calculations)
-        const astroData = generateAstrologicalData(birthDate, birthTime, birthLocation);
+        const astroData = generateAstrologicalData(birthDate, birthTime);
 
         const chartData = {
+            // Without a name, the model defaults to "Chart for <location>"
+            ...(name && { name }),
             birthDate: new Date(birthDate),
             birthTime,
             birthLocation,

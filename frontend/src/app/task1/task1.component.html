@@ -12,54 +12,155 @@
   </div>
 
   <ng-container *ngIf="!isLoading && !error">
-    <div *ngIf="charts.length > 0; else noCharts" class="charts-grid">
-      <article
-        *ngFor="let chart of charts; let i = index; trackBy: trackById"
-        class="chart-card"
-        [style.animation-delay.ms]="i * 70"
+    <div *ngIf="groups.length > 0; else noCharts" class="sign-rows">
+      <section
+        *ngFor="let group of groups; let g = index; trackBy: trackBySign"
+        class="sign-row"
+        [style.animation-delay.ms]="g * 80"
+        [attr.aria-label]="group.sign + ' charts'"
       >
-        <header class="chart-header">
-          <h3>{{ chart.name || 'Unnamed Chart' }}</h3>
-          <span *ngIf="chart.isPublic === false" class="badge">Private</span>
+        <header class="row-header">
+          <div class="row-title">
+            <span class="row-symbol" aria-hidden="true">{{ group.symbol }}</span>
+            <div>
+              <h3>{{ group.sign }}</h3>
+              <p class="row-meta">{{ group.range }} · {{ group.element }}</p>
+            </div>
+            <span class="row-count">{{ group.charts.length }} {{ group.charts.length === 1 ? 'chart' : 'charts' }}</span>
+          </div>
+
+          <div class="row-arrows" *ngIf="scrollState[group.sign]?.prev || scrollState[group.sign]?.next">
+            <button
+              type="button"
+              class="arrow-btn"
+              aria-label="Previous"
+              [disabled]="!scrollState[group.sign]?.prev"
+              (click)="scroll(track, -1)"
+            >‹</button>
+            <button
+              type="button"
+              class="arrow-btn"
+              aria-label="Next"
+              [disabled]="!scrollState[group.sign]?.next"
+              (click)="scroll(track, 1)"
+            >›</button>
+          </div>
         </header>
 
-        <div class="chart-details">
-          <div class="detail-row">
-            <span class="detail-label">📅 Date</span>
-            <span>{{ formatDate(chart.birthDate) }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">🕒 Time</span>
-            <span>{{ chart.birthTime || 'Not specified' }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">📍 Location</span>
-            <span class="detail-value">{{ chart.birthLocation || 'Not specified' }}</span>
-          </div>
+        <div
+          #track
+          class="carousel-track"
+          tabindex="0"
+          [attr.data-sign]="group.sign"
+          (scroll)="onTrackScroll(group.sign, track)"
+        >
+          <article
+            *ngFor="let chart of group.charts; let i = index; trackBy: trackById"
+            class="chart-card"
+            [style.animation-delay.ms]="g * 80 + i * 60"
+          >
+            <header class="chart-header">
+              <h3>{{ chart.name || 'Unnamed Chart' }}</h3>
+              <div class="header-actions">
+                <span *ngIf="chart.isPublic === false" class="badge">Private</span>
+                <button
+                  type="button"
+                  class="delete-btn"
+                  [attr.aria-label]="'Delete ' + (chart.name || 'chart')"
+                  title="Delete chart"
+                  (click)="askDelete(chart)"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" />
+                  </svg>
+                </button>
+              </div>
+            </header>
+
+            <div
+              *ngIf="confirmingId === chartId(chart)"
+              class="confirm-overlay"
+              role="alertdialog"
+              aria-modal="false"
+              [attr.aria-label]="'Delete ' + chart.name + '?'"
+              (keydown.escape)="cancelDelete()"
+            >
+              <div class="confirm-icon" aria-hidden="true">!</div>
+              <p class="confirm-title">Delete this chart?</p>
+              <p class="confirm-name">{{ chart.name }}</p>
+              <p class="confirm-hint">This action cannot be undone.</p>
+              <p *ngIf="deleteErrors[chartId(chart)]" class="confirm-error" role="alert">{{ deleteErrors[chartId(chart)] }}</p>
+              <div class="confirm-actions">
+                <button
+                  type="button"
+                  class="btn-ghost"
+                  (click)="cancelDelete()"
+                  [disabled]="deletingIds.has(chartId(chart))"
+                >Cancel</button>
+                <button
+                  type="button"
+                  class="btn-danger"
+                  (click)="confirmDelete(chart)"
+                  [disabled]="deletingIds.has(chartId(chart))"
+                >
+                  <span *ngIf="deletingIds.has(chartId(chart))" class="mini-spinner" aria-hidden="true"></span>
+                  {{ deletingIds.has(chartId(chart)) ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="chart-details">
+              <div class="detail-row">
+                <span class="detail-label">📅 Date</span>
+                <span>{{ formatDate(chart.birthDate) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">🕒 Time</span>
+                <span>{{ chart.birthTime || 'Not specified' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">📍 Location</span>
+                <span class="detail-value">{{ chart.birthLocation || 'Not specified' }}</span>
+              </div>
+            </div>
+
+            <div class="signs-section">
+              <div class="sign-item">
+                <span class="sign-label">Sun</span>
+                <span class="sign-glyph" aria-hidden="true">{{ signSymbol(chart.sunSign) }}</span>
+                <span class="sign-value">{{ chart.sunSign }}</span>
+              </div>
+              <div class="sign-item">
+                <span class="sign-label">Moon</span>
+                <span class="sign-glyph" aria-hidden="true">{{ signSymbol(chart.moonSign) }}</span>
+                <span class="sign-value">{{ chart.moonSign }}</span>
+              </div>
+              <div class="sign-item">
+                <span class="sign-label">Rising</span>
+                <span class="sign-glyph" aria-hidden="true">{{ signSymbol(chart.risingSign) }}</span>
+                <span class="sign-value">{{ chart.risingSign }}</span>
+              </div>
+            </div>
+
+            <ul class="planets-grid">
+              <li class="planet-item" *ngFor="let planet of getPlanetsArray(chart)">
+                <span class="planet-name"><span class="planet-symbol" aria-hidden="true">{{ planet.symbol }}</span>{{ planet.name }}</span>
+                <span class="planet-details">{{ signSymbol(planet.sign) }} {{ planet.sign }} <strong>{{ planet.degree }}°</strong></span>
+              </li>
+            </ul>
+          </article>
         </div>
 
-        <div class="signs-section">
-          <div class="sign-item">
-            <span class="sign-label">☀️ Sun</span>
-            <span class="sign-value">{{ signSymbol(chart.sunSign) }} {{ chart.sunSign }}</span>
-          </div>
-          <div class="sign-item">
-            <span class="sign-label">🌙 Moon</span>
-            <span class="sign-value">{{ signSymbol(chart.moonSign) }} {{ chart.moonSign }}</span>
-          </div>
-          <div class="sign-item">
-            <span class="sign-label">⬆️ Rising</span>
-            <span class="sign-value">{{ signSymbol(chart.risingSign) }} {{ chart.risingSign }}</span>
-          </div>
+        <!-- Position indicator for swipe navigation (mobile only, hidden via CSS on desktop) -->
+        <div class="carousel-dots" *ngIf="group.charts.length > 1" aria-hidden="true">
+          <span
+            *ngFor="let chart of group.charts; let i = index; trackBy: trackById"
+            class="dot"
+            [class.active]="i === (scrollState[group.sign]?.index ?? 0)"
+          ></span>
         </div>
-
-        <ul class="planets-grid">
-          <li class="planet-item" *ngFor="let planet of getPlanetsArray(chart)">
-            <span class="planet-name"><span class="planet-symbol">{{ planet.symbol }}</span>{{ planet.name }}</span>
-            <span class="planet-details">{{ planet.sign }} {{ planet.degree }}°</span>
-          </li>
-        </ul>
-      </article>
+      </section>
     </div>
 
     <ng-template #noCharts>

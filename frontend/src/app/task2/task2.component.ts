@@ -32,7 +32,7 @@ function todayIso(): string {
   return new Date(now.getTime() - tzOffsetMs).toISOString().split('T')[0];
 }
 
-const EMPTY_FORM = { birthDate: '', birthTime: '', birthLocation: '' };
+const EMPTY_FORM = { name: '', birthDate: '', birthTime: '', birthLocation: '' };
 
 @Component({
   selector: 'app-task2',
@@ -68,6 +68,7 @@ export class Task2Component {
     private chartService: ChartService
   ) {
     this.chartForm = this.formBuilder.group({
+      name: ['', [Validators.required, notBlank, Validators.maxLength(100)]],
       birthDate: ['', [Validators.required, notInFuture]],
       birthTime: ['', [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)]],
       birthLocation: ['', [Validators.required, notBlank, Validators.minLength(2), Validators.maxLength(200)]]
@@ -93,8 +94,9 @@ export class Task2Component {
     this.error = null;
     this.result = null;
 
-    const { birthDate, birthTime, birthLocation } = this.chartForm.value;
+    const { name, birthDate, birthTime, birthLocation } = this.chartForm.value;
     const request: CalculateChartRequest = {
+      name: String(name).trim(),
       birthDate,
       // <input type="time"> may include seconds on some browsers (HH:MM:SS)
       birthTime: String(birthTime).slice(0, 5),

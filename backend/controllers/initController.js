@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
 const Chart = require('../models/Chart');
+const { buildTopUpCharts, MIN_CHARTS_PER_SIGN } = require('../utils/sampleCharts');
+
+/** Adds generated sample charts so every Sun sign has at least MIN_CHARTS_PER_SIGN. */
+async function topUpSigns() {
+    const counts = await Chart.aggregate([{ $group: { _id: '$sunSign', count: { $sum: 1 } } }]);
+    const countsBySign = Object.fromEntries(counts.map(c => [c._id, c.count]));
+    const charts = buildTopUpCharts(countsBySign);
+    if (charts.length) await Chart.insertMany(charts);
+    return charts.length;
+}
 
 // @desc    Initialize project - check connections, seed data if needed
 // @route   GET /api/init
@@ -33,20 +43,7 @@ exports.initializeProject = async (req, res) => {
                 const chartCount = await Chart.countDocuments();
                 initResults.charts.count = chartCount;
 
-                // Check if database is already seeded
-                if (chartCount > 0) {
-                    initResults.charts.seeded = false;
-                    initResults.charts.message = 'Database already seeded';
-                    console.log('✓ Database already contains charts, skipping seed');
-
-                    return res.json({
-                        success: true,
-                        message: 'Database already seeded, no action taken',
-                        data: initResults
-                    });
-                }
-
-                // Seed data if no charts exist
+                // Seed the hand-written sample charts if no charts exist
                 if (chartCount === 0) {
                     const sampleCharts = [
                         {
@@ -302,10 +299,20 @@ exports.initializeProject = async (req, res) => {
                     ];
 
                     await Chart.insertMany(sampleCharts);
+
+                    // Fill every sign up to MIN_CHARTS_PER_SIGN so each carousel has content.
+                    // Only done on an empty database, so charts deleted by the user stay deleted.
+                    const added = await topUpSigns();
                     initResults.charts.seeded = true;
-                    initResults.charts.count = sampleCharts.length;
-                    console.log('✓ Seeded database with sample charts');
+                    initResults.charts.added = added;
+                    console.log('✓ Seeded database with ' + (sampleCharts.length + added)
+                        + ' sample charts (min ' + MIN_CHARTS_PER_SIGN + ' per sign)');
+                } else {
+                    initResults.charts.added = 0;
+                    console.log('✓ Database already contains charts, skipping seed');
                 }
+
+                initResults.charts.count = await Chart.countDocuments();
             } else {
                 initResults.database.status = 'not connected';
                 initResults.database.connected = false;
